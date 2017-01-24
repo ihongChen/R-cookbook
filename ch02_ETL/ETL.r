@@ -82,7 +82,7 @@ write.xlsx2(wb2,"wbdata.xlsx",sheetName = "標題一")
 
 
 #################################################
-## Reading Data from db (Mysql)
+## Reading Data from db (Mysql,MSsql)
 #################################################
 
 ## jdbc
@@ -116,4 +116,20 @@ dbSendQuery(mydb,"use test;")
 fetch(dbSendQuery(mydb,"select * from iris;"))
 
 
+### mssql 
 
+library(RODBC)
+connTest <- odbcDriverConnect("Driver=SQL Server;Server=servername;Database=Test;Uid=uid;Pwd=pwd;")
+CRM=sqlQuery(connTest,"select top 100 * from BANK2016.dbo.v_cifall999_201602")
+str(CRM)
+
+sqlSave(connTest,CRM,tablename = "CRM2")
+sqlQuery(connTest,"select * from CRM2")
+
+
+#################################################
+## rvest Web scraping
+#################################################
+
+
+### throw out read_xml error ?? don't know why...
