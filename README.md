@@ -4,7 +4,7 @@
 * [x] Function in R  
 * [x] ETL
 * [x] Data Preprocessing and Preparation
-* [ ] Data Manipulation
+* [x] Data Manipulation
 * [ ] ggplot2
 * [ ] Interactive Reports
 * [ ] Simulation from Probability Distributions
