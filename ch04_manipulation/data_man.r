@@ -199,13 +199,39 @@ head(full_outer_join)
 # Subsetting and slicing data with dplyr
 #################################################
 
+library(dplyr)
+
+## filter 
+quantity.over.3<-filter(order_dt,Quantity>=3)
+head(quantity.over.3)
+
+quantity.price.filter <- filter(order_dt,Quantity>=3,Price>1000)
+head(quantity.price.filter)
+#
+head(order_dt,3)
+quantity.price.in.filter <- filter(order_dt,Product %in% c('P0006944501','P0006018073'))
+head(quantity.price.in.filter)
+
+## slice 
+
+slice(order_dt,1:10)
+slice(order_dt,(n()-4):n()) # n() last row
 
 
+#################################
+### RSQLite (dplyr)   ###########
+#################################
+library(RSQLite)
 
+orderdt <- fread("purchase_order.tab",header=TRUE, sep="\t")
 
+my_db <- src_sqlite("order.sqlite",create=T)
+order_sqlite <- copy_to(my_db,orderdt,temporary = FALSE)
 
-
-
+ordertbl_from_sqlite <- tbl(my_db,sql("select product from orderdt"))
+head(ordertbl_from_sqlite)
+class(ordertbl_from_sqlite)
+## as.data.table(orderdf_from_sqlite) ## convert tbl type 
 
 
 
@@ -213,41 +239,225 @@ head(full_outer_join)
 # Sampling data with dplyr
 #################################################
 
+set.seed(123)
+sample_n(order_dt,6,replace = TRUE)
+sample.dt <- sample_frac(order_dt,0.1,replace = FALSE)
+nrow(sample.dt)
+ncol(sample.dt)
 
+df <- data.frame(a=seq(1,10,1),b=c(rep(1,8),rep(2,2)))
+sample_n(df,5,weight=df$b)
 #################################################
 # Selecting columns with dplyr
 #################################################
 
+##
+select.quantity.price<-select(order_dt,Quantity,Price)
+head(select.quantity.price)
 
+## -  :exclude
+select(order_dt,-Price)
+head(order_dt)
+
+## select ,everything
+select.everything <-select(order_dt,everything())
+head(select.everything,3)
+
+## 
+select.from.user.to.quantity <- select(order_dt,User:Quantity)
+head(select.from.user.to.quantity) ## head(select(order_dt,3:5)) ## same
+
+## select, contain('?')
+select.contains.p <- select(order_dt,contains('P'))
+head(select.contains.p)
+
+## select + filter
+
+filter(order_dt,Price>=1000) %>%
+  select(contains('P')) %>%
+  head()
+## same as head(filter(select(...)),Price>=1000)
+
+## num_range
+set.seed(123)
+df <-data.frame(a1=rnorm(3),a2=rnorm(3),b1=1,b2=NA,b3="str")
+df
+select(df,num_range("a",1:2))
+select(df,contains("a"))
 #################################################
 # Chaining operations in dplyr
 #################################################
+
+sum(1:10)
+
+1:10 %>% sum()
+
+select(order_dt,contains('P')) %>%
+  filter(Price>=1000) %>%
+  select(Price) %>%
+  sum()
+
 
 
 #################################################
 # Arranging rows with dplyr
 #################################################
 
+##
+order_dt %>% 
+  arrange(Price) %>% ## ascend by default
+  head(3)
 
+##
+order_dt %>%
+  arrange(desc(Price)) %>% # or -Price
+  head(3)
 
-
+## sort data by two column variables
+order_dt %>%
+  arrange(Price,desc(Quantity)) %>%
+  head(6)
 
 
 #################################################
 # Eliminating duplicated rows with dplyr
 #################################################
+## distinct
+order_dt %>%
+  select(Product) %>%
+  distinct() %>%
+  head(6)
+
+distinct.product.user.dt <- {
+  order_dt %>%
+    select(Product,User) %>%
+    distinct()
+  }
+
+nrow(order_dt)
+nrow(distinct.product.user.dt)
+
 
 #################################################
 # Adding new columns with dplyr
 #################################################
+
+## mutate
+order_dt %>%
+  select(Quantity, Price) %>%
+  mutate(avg_price=Price/Quantity) %>%
+  # arrange(desc(avg_price)) %>%
+  head()
+
+## transmute
+
+transmute(order_dt,Avg_Price=Price/Quantity) %>% head()
+
+
+## transform (Base)
+
+order_dt %>%
+  select(Quantity,Price) %>%
+  transform(Avg_Price = Price/Quantity) %>%
+  head()
 
 #################################################
 # Summarizing data with dplyr
 #################################################
 
 
+## summarise, group by  
+## select User,sum(Price) from orderdt group by User
+order_dt %>% 
+  select(User,Price) %>%
+  group_by(User) %>%
+  summarise(sum(Price)) %>%
+  head()
+
+
+## summarise_each ,
+
+order_dt %>%
+  select(User,Price,Quantity) %>%
+  filter(!is.na(Price)) %>%
+  group_by(User) %>%
+  summarise_each(funs(sum),Price,Quantity) %>%
+  head()
+
+
+## summarise_each
+
+order_dt %>%
+  select(User,Price) %>%
+  filter(!is.na(Price)) %>%
+  group_by(User) %>%
+  summarise_each(funs(max(.,na.rm=TRUE),min(.,na.rm=TRUE)),
+                 Price) %>%
+  head()
+
+## n() : count numbers
+
+purchase_dt %>%
+  select(User,Product) %>%
+  group_by(Product) %>%
+  summarise_each(funs(n())) %>%
+  head()
+
+## n_distinct
+purchase_dt %>%
+  select(User,Product) %>%
+  group_by(Product) %>%
+  summarise_each(funs(n_distinct(User))) %>%
+  arrange(desc(User)) %>%
+  head()
+
+## 
+
+sample.df <- data.frame(user=c('U1','U1','U1','U3'),
+                        product=c("A","B","A","B"),
+                        price=c(200,100,300,300))
+
+sample.df %>%
+  group_by(user,product) %>%
+  summarise(price_sum=sum(price)) %>%
+  arrange(price_sum)
 
 
 #################################################
 # Merging data with dplyr
 #################################################
+
+product.dt <- order_dt[,.(Buy=length(Action)),by=Product] 
+head(product.dt[order(-Buy)])
+
+## above same as ##
+order_dt %>%
+  group_by(Action,Product) %>%
+  summarise(Buy=n()) %>%
+  arrange(desc(Buy)) %>%
+  head()
+##
+
+view.dt <-purchase_dt[,.(n_views=length(User)),by=Product]
+head(view.dt)
+
+# inner_join
+merged.dt <- inner_join(view.dt,product.dt,by="Product")
+head(merged.dt)
+
+## left_join
+left_join.dt <- left_join(view.dt,product.dt,by="Product")
+head(left_join.dt)
+
+## right_join
+right_join.dt <- right_join(view.dt, product.dt, by="Product")
+head(right_join.dt)
+
+
+## full join 
+full_join(view.dt,product.dt,by="Product") %>%
+  head()
+
+## anti_join
+anti_join(view.dt,product.dt,by="Product") %>%
+  head()
