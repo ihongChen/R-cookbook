@@ -133,9 +133,24 @@ g + geom_point() + geom_point(stat="summary",fun.y="mean",color="red",size=4)
 ##########################################
 # Adjusting plot scales
 ##########################################
+##
+g<-ggplot(data=sample_sum,
+          mapping=aes(x=Year_Month,y=Province,
+                      size=Total_Sales,color=Province))
+##
+g + geom_point(aes(size=Total_Sales)) +
+  scale_size_continuous(range=c(1,10)) + ggtitle('Resize the point')
+##
+g + geom_point(aes(shape=Province)) + scale_shape_manual(values=c(5,10)) +
+  ggtitle("Adjust The shape of the Point")
+##
+g2 <- ggplot(data=sample_sum, mapping=aes(x=Year_Month,y=Total_Sales,color=Province))
 
+g2 + geom_bar(stat="identity",aes(fill=Province),position="dodge") +
+  scale_fill_brewer(palette = 1) + ggtitle("Refill Bar color")
 
-
+g2 + geom_bar(stat="identity",aes(fill=Province),position="dodge") + 
+  scale_y_continuous(limits=c(1,1e5),trans="log10") + ggtitle("Rescale y Axes")
 ##########################################
 # Faceting
 ##########################################
