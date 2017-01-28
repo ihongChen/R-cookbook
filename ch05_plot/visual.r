@@ -155,20 +155,79 @@ g2 + geom_bar(stat="identity",aes(fill=Province),position="dodge") +
 # Faceting
 ##########################################
 
+## subplot(facet_wrap)
 
+g<-ggplot(data=sample_sum, mapping = aes(x=Year_Month,y=Total_Sales,color=Province))
+
+g+geom_point(size = 5) + facet_wrap(~Province) +
+  ggtitle('Create Multiple Subplots by Province')
+
+g+geom_point() + facet_wrap(~Province,ncol=1) + ggtitle('Multiple Subplots in Vertical Direction')
+
+## facet_grid
+
+g <- ggplot(data=sample_sum,mapping=aes(x="Total Sales",y=Total_Sales,col=Province))
+g+geom_bar(stat="identity",aes(fill=Province)) + facet_grid(Year_Month~Province) +
+  ggtitle("facet_grid Example")
 
 ##########################################
 # Adjusting themes
 ##########################################
 
-
+## skip ##
 
 ##########################################
 # Combining plots
 ##########################################
 
+library(grid)
+grid.newpage() # create new canvas
+g <- ggplot(data=sample_sum, mapping = aes(x=Year_Month,y=Total_Sales,color=Province))
+plot1 <- g + geom_point(size=5) + ggtitle('Scatter Plot')
+plot2 <- g+ geom_line(size=3) + ggtitle('Line chart')
+plot2
+pushViewport(viewport(layout=grid.layout(1,2)))
+print(plot1,vp=viewport(layout.pos.row=1,layout.pos.col = 1))
+print(plot2,vp=viewport(layout.pos.row=1,layout.pos.col = 2))
 
+## gridExtra (more comfortable)
+install.packages("gridExtra")
+library("gridExtra")
 
+grid.arrange(plot1,plot2,ncol=2)
 ##########################################
 # Creating maps
 ##########################################
+
+install.packages("ggmap")
+install.packages("maptools")
+
+library(ggmap)
+library(maptools)
+
+## 
+## fail to follw the book ex..(can't find correct .shp files)
+
+## ref :https://blog.gtwang.org/r/r-ggmap-package-spatial-data-visualization/
+
+map <- get_map(location = "Taiwan",zoom=7 , language = "zh-TW")
+ggmap(map)
+
+## 
+
+map <- 
+  get_map(location=c(lon=120.233937,lat=22.993013),
+               zoom=10, language="zh-TW")
+ggmap(map)
+
+## maptype(roadmap,satellite,hybird)
+
+map <-get_map(location=c(lon=120.233937,lat=22.993013),
+              zoom=10,language='zh-TW',maptype='toner-lite')
+ggmap(map)
+
+## darken 
+ggmap(map,darken=c(0.5,"white"))
+
+
+## 

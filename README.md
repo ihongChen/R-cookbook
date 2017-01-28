@@ -5,7 +5,7 @@
 * [x] ETL
 * [x] Data Preprocessing and Preparation
 * [x] Data Manipulation
-* [ ] ggplot2
+* [x] ggplot2
 * [ ] Interactive Reports
 * [ ] Simulation from Probability Distributions
 * [ ] Statistical Inference
