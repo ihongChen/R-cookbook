@@ -167,3 +167,5 @@ E(net)$arrow.size <- .2
 E(net)$edge.color <- "gray80"
 E(net)$width <- 1+E(net)$weight/12
 plot(net) 
+legend(x=-1.5, y=-1.1, c("Newspaper","Television", "Online News"), pch=21,
+       col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
