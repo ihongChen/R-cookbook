@@ -1,4 +1,5 @@
 ## lifetime cycle of a customer ## 
+## from http://analyzecore.com/2015/02/16/customer-segmentation-lifecycle-grids-with-r/
 
 # loading libraries
 library(dplyr)
@@ -51,6 +52,7 @@ head(aqw)
 today = as.Date('2012-4-11',format='%Y-%m-%d')
 
 orders = dcast(orders,orderId+clientId+gender+orderdate~product)
+
 orders = 
   orders %>%
   group_by(clientId) %>%
@@ -66,7 +68,7 @@ orders =
 p1 = 
   ggplot(orders,aes(x=frequency)) +
   theme_bw() +
-  scale_x_continuous(breaks=c(1:10)) +
+  # scale_x_continuous(breaks=c(1:10)) +
   geom_histogram(alpha=0.6,binwidth=0.5) +
   ggtitle('Distribution by frequency')
 
