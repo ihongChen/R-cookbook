@@ -3,7 +3,8 @@
 #################################################
 ## Download files, read csv files
 #################################################
-setwd('d:/ihong/resource/data_book/R/R_Cookbook_EX/ch02_ETL/')
+# setwd('d:/ihong/resource/data_book/R/R_Cookbook_EX/ch02_ETL/')
+setwd('~/Dropbox/book/R/R_data_cookbook/ch02_ETL/')
 url = 'http://chart.finance.yahoo.com/table.csv?s=^GSPC&a=11&b=23&c=2016&d=0&e=23&f=2017&g=d&ignore=.csv'
 download.file(url,'snp500.csv')
 

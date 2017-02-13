@@ -1,6 +1,7 @@
 ## regx 練習,來自issac網站
-## http://issacstylelife.blogspot.tw/2016/05/r-regular-expression-function.html?m=1
-
+## 1. http://issacstylelife.blogspot.tw/2016/05/r-regular-expression-function.html?m=1
+## 2. http://stat545.com/block022_regular-expression.html
+##### 1 ##########
 text= c('Chrome CB3-111', 'Chrome 11 CB3-115', 'Chrome 15 CB5-122', 'xx10923', '13 EL1')
 text
 grep(pattern= 'Chrome', x= text)
@@ -87,3 +88,17 @@ ans =
 })
 
 grep('\\b[A-Z]',strsplit(text[2],split="[[:punct:][:blank:]]")[[1]],value=T)
+
+
+
+##### 2 ############ 
+(strings <- c("^ab", "ab", "abc", "abd", "abe", "ab 12"))
+
+grep("ab.",strings,value=T)
+grep("ab[c-e]",strings,value=T)
+grep("ab[^c]",strings,value=T)
+grep("^ab*",strings,value=T)
+grep("^ab.",strings,value=T)
+grep("\\^ab",strings,value=T)
+grep("abc|abd",strings,value=T)
+gsub("(ab) 12","\\1 34",strings)
